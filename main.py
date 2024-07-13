@@ -26,5 +26,3 @@ if not is_logged_in():
     menu_cols[6].button("Get Started")
 else:
     menu_cols[5].button(label="Sign out", on_click=logout)
-
-print(f"is_logged_in: {is_logged_in()}")

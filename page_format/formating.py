@@ -3,6 +3,7 @@ import streamlit as st
 from utils import get_article_image_base64
 
 
+@st.cache_resource
 def default_pages_config(_title=None, layout="wide"):
     # st.set_page_config(page_title=_title,
     #                    page_icon=os.path.join("assets", "images", "logo-care.png"),

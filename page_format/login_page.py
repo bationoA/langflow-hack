@@ -2,7 +2,7 @@ import os.path
 import streamlit as st
 from db_handler import init_database
 
-from utils import authorize_login, is_logged_in, logout
+from utils import authorize_login, is_logged_in, logout, redirect_to
 
 init_database()
 
@@ -28,8 +28,9 @@ def display_login_page():
                 if not login_status:
                     st.error("The username or password is incorrect")
                 else:
+                    # redirect_to(url="")
                     st.success("You are now authenticated!")
-                    st.page_link(label="Continue", page=os.path.join("pages", "chat.py"))
+                    st.page_link(label="Continue", page=os.path.join("Streamlit_app.py"))
             elif submitted:
                 st.error("username and password must be provided")
 

@@ -36,5 +36,3 @@ else:
     st.write("You're already logged in")
     st.button(label="Sign out", on_click=logout)
 
-
-print(f"is_logged_in: {is_logged_in()}")

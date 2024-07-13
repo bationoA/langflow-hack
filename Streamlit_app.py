@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-from streamlit_option_menu import option_menu
+
 st.set_page_config(page_title=None,
                    page_icon=os.path.join("assets", "images", "logo-care.png"),
                    layout="wide",
@@ -8,12 +8,9 @@ st.set_page_config(page_title=None,
                    menu_items={"Get help": "mailto:amosb.dev@gmail.com | maigaabdoulaziz000@gmail.com",
                                "Report a Bug": "mailto:amosb.dev@gmail.com | maigaabdoulaziz000@gmail.com",
                                "About": None})
-from PIL import Image
-
+from streamlit_option_menu import option_menu
 from page_format import default_pages_config, display_login_page, display_chat_page
 from utils import is_logged_in
-
-
 
 default_pages_config()
 
@@ -71,27 +68,26 @@ st.markdown("""
 # 1=sidebar menu, 2=horizontal menu, 3=horizontal menu w/ custom menu
 EXAMPLE_NO = 2
 
-
-def streamlit_menu():
-
-    login_or_logout = "Login" if not is_logged_in() else "Logout"
-    menu_options = ["Services", "Partnership", "Donate", "Pricing", login_or_logout, "Get Started", "Chat"]
-
-    if is_logged_in():
-        menu_options = [item for item in menu_options if item != "Get Started"]
-
-    # if example == 2:
-    # 2. horizontal menu w/o custom style
-    selected = option_menu(
-        menu_title=None,  # required
-        options=menu_options,  # required
-        # icons=["house", "book", "envelope", "house", "book", "envelope"],  # optional
-        # menu_icon="cast",  # optional
-        manual_select=0,  # optional
-        orientation="horizontal",
-        styles="width: 100%;"
-    )
-    return selected
+# def streamlit_menu():
+#
+#     login_or_logout = "Login" if not is_logged_in() else "Logout"
+#     menu_options = ["Services", "Partnership", "Donate", "Pricing", login_or_logout, "Get Started", "Chat"]
+#
+#     if is_logged_in():
+#         menu_options = [item for item in menu_options if item != "Get Started"]
+#
+#     # if example == 2:
+#     # 2. horizontal menu w/o custom style
+#     selected = option_menu(
+#         menu_title=None,  # required
+#         options=menu_options,  # required
+#         # icons=["house", "book", "envelope", "house", "book", "envelope"],  # optional
+#         # menu_icon="cast",  # optional
+#         manual_select=0,  # optional
+#         orientation="horizontal",
+#         styles="width: 100%;"
+#     )
+#     return selected
 
 
 menu_row_cols = st.columns([1, 9])
@@ -117,27 +113,12 @@ with menu_row_cols[1]:
         orientation="horizontal",
         styles="width: 100%;"
     )
+
+    st.session_state["selected_menu"] = selected
     # selected = streamlit_menu()
-    print(f"selected: {selected}")
-    print(f"option_menu: {option_menu}")
 
-
-    # opts = ["Home1", "Upload", "Tasks", 'Settings']
-    # selected3 = option_menu(None, opts,
-    #                         icons=['house', 'cloud-upload', "list-task", 'gear'],
-    #                         menu_icon="cast", default_index=0, orientation="horizontal",
-    #                         styles={
-    #                             "container": {"padding": "0!important", "background-color": "#fafafa"},
-    #                             "icon": {"color": "orange", "font-size": "25px"},
-    #                             "nav-link": {"font-size": "25px", "text-align": "left", "margin": "0px",
-    #                                          "--hover-color": "#eee"},
-    #                             "nav-link-selected": {"background-color": "green"},
-    #                         }
-    #                         )
-
-
-    # Create two columns
-col1, col2 = st.columns([2,1])
+# Create two columns
+col1, col2 = st.columns([2, 1])
 
 if selected == "Services":
     # Display text in the second column
@@ -155,10 +136,6 @@ if selected == "Services":
 
         """, unsafe_allow_html=True)
 
-        st.markdown("""<br><br><br>""", unsafe_allow_html=True)
-
-        st.page_link(label="Get Anonymous assistance from AI", page=os.path.join("pages", "chat.py"), )
-
     # Display the image in the first column
     with col2:
         st.image(image=os.path.join("assets", "images", "img2.png"))
@@ -172,5 +149,22 @@ if selected == "Pricing":
 if selected in ["Login", "Logout"]:
     display_login_page()
 if selected == "Chat":
-    st.title(f"You have selected {selected}")
-    # display_chat_page()
+    info_row = st.columns([1, 1, 1])
+    if is_logged_in():
+        info_row[1].success("All your conversation are anonymous")
+
+        chat_tab_row = st.columns([1, 5, 1])
+
+        chat_type_tabs = chat_tab_row[1].tabs(["Chat Bot", "Talk to a Doctor"])
+
+        with chat_type_tabs[0]:
+            st.info(
+                "You are talking with our system, not a human. All your conversations are private and accessible by you only")
+            display_chat_page()
+        with chat_type_tabs[1]:
+            st.warning("You will talk with a Doctor. A human.")
+
+    else:
+
+        info_row[1].error("You need to login to use the chat bot.")
+        info_row[1].info("Go to the login tab to log in.")

@@ -1,7 +1,9 @@
 import streamlit as st
 
-# if not is_logged_in():
-#     redirect_to("login")
+from flow import get_flow_response
+from utils import is_logged_in, redirect_to
+
+
 
 
 
@@ -88,22 +90,15 @@ st.markdown("""
 
 
 def display_chat_page():
-    first_row_cols = st.columns([1, 1, 1])
-    first_row_cols[0].page_link(label="Home", page="Streamlit_app.py")
-    first_row_cols[1].markdown("""<h1 class="text-color-1">TrustNode Health</h1>""", unsafe_allow_html=True)
+    if not is_logged_in():
+        redirect_to("")
 
     st.session_state['ui-text'] = {}
 
     st.session_state['ui-text']['how_can_i_help_with_tourism_benin'] = "How can I help you?"
     st.session_state['ui-text']['a_moment_please'] = "A moment please"
 
-    container = st.container(height=650, border=True)
-
-    # row_chat_cols = st.columns([1, 10, 1])
-    row_chat_cols = container.columns([1, 10, 1])
-
-    row_chat_cols[0].write("1st column")
-    row_chat_cols[2].write("3rd column")
+    container = st.container(height=450, border=True)
 
     # Initialize chat history
     if "messages" not in st.session_state:
@@ -111,7 +106,7 @@ def display_chat_page():
 
     # Display chat messages from history on app rerun
     for message in st.session_state.messages:
-        with row_chat_cols[1].chat_message(message["role"]):
+        with container.chat_message(message["role"]):
             st.markdown(message["content"], unsafe_allow_html=True)
 
     # prompt = st.session_state['prompt'] if "prompt" in st.session_state else None
@@ -119,25 +114,31 @@ def display_chat_page():
     # React to user input
     if prompt := st.chat_input(f"{st.session_state['ui-text']['how_can_i_help_with_tourism_benin']}?"):
         # Display user message in chat message container
-        row_chat_cols[1].chat_message("user").markdown(prompt)
+        container.chat_message("user").markdown(prompt)
 
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
 
         # Collect user's query
         # pipeline.user_query = prompt
-        with st.spinner(f"{st.session_state['ui-text']['a_moment_please']}..."):
-            # pipeline.run()
-            print("Spinner")
+        with container:
+            with st.spinner(f"{st.session_state['ui-text']['a_moment_please']}..."):
+                # pipeline.run()
+                response = get_flow_response(user_message=prompt)
+                # try:
+                #     response = get_flow_response(user_message=prompt)
+                # except BaseException as e:
+                #     response = str(e)
+
 
         # response = f"Echo: {prompt}"
         #     response = format_article_display(pipeline.paragraphs) if len(pipeline.paragraphs) \
         # else f"""<p style="background-colr: white; color: red">Connection Error: Check your internet, OpenAI API key or try later.</p>"""
 
-        response = f"""<p style="background-colr: white; color: red">Connection Error: Check your internet, OpenAI API key or try later.</p>"""
+        # response = f"""<p style="background-colr: white; color: red">Connection Error: Check your internet, OpenAI API key or try later.</p>"""
 
         # Display assistant response in chat message container
-        with row_chat_cols[1].chat_message("assistant"):
+        with container.chat_message("assistant"):
             st.markdown(response, unsafe_allow_html=True)
         # Add assistant response to chat history
         st.session_state.messages.append({"role": "assistant", "content": response})
