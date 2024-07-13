@@ -125,6 +125,7 @@ def display_chat_page():
             with st.spinner(f"{st.session_state['ui-text']['a_moment_please']}..."):
                 # pipeline.run()
                 response = get_flow_response(user_message=prompt)
+                response = dict(response[0].outputs[0].results["message"])["text"]#['outputs'][0]['results']['message']['data']['text']
                 # try:
                 #     response = get_flow_response(user_message=prompt)
                 # except BaseException as e:

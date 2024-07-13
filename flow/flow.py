@@ -13,10 +13,10 @@ TWEAKS = {
   "ChatInput-UYsRC": {},
   "Prompt-pMN5s": {},
   "ChatOutput-gwqwX": {},
-  "MistralModel-WeSs4": {"mistral_api_key": os.environ['AIML_API_KEY'], "mistral_api_base": os.environ['AIML_API_KEY'], "model_name": os.environ['AIML_API_KEY']},
+  "MistralModel-WeSs4": {"mistral_api_key": os.environ['AIML_API_KEY'], "mistral_api_base": os.environ['MISTRAL_API_BASE'], "model_name": os.environ['MISTRAL_MODEL_NAME']},
   "OpenAIEmbeddings-SW8Bm": {"openai_api_key": os.environ['OPENAI_API_KEY']},
   "ParseData-zoXIi": {},
-  "AstraDB-dISi3": {"api_endpoint": os.environ['ASTRA_DB_ENDPOINT'], "token": os.environ['ASTRA_DB_TOKEN']}
+  "AstraDB-dISi3": {"api_endpoint": os.environ['ASTRA_DB_ENDPOINT'], "token": os.environ['ASTRA_DB_TOKEN'], "collection_name": os.environ['COLLECTION_NAME']}
 }
 
 
