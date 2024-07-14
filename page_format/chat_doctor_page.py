@@ -116,7 +116,6 @@ def display_chat_doctor_page():
 
     container_doct = st.container(height=450, border=True)
 
-
     # Initialize chat history
     if "doctor_messages" not in st.session_state:
         # Get sample discussion with a doctor
@@ -144,23 +143,22 @@ def display_chat_doctor_page():
         # Add user message to chat history
         st.session_state.doctor_messages.append({"role": "user", "content": prompt})
 
-        # Collect user's query
-        # pipeline.user_query = prompt
-        with container_doct:
-            with st.spinner(f"{st.session_state['ui-text']['a_moment_please']}..."):
-                print("user input---{}: ".format(prompt))
-                print("prompt---{}: ".format(pre_prompt.replace("{user_input}", prompt)))
+        if os.getenv("OPENAI_API_KEY", None) is None:
+            st.error("You need to provide your OpenAI API key in the sidebar at side of the screen.")
+        else:
+            # Collect user's query
+            # pipeline.user_query = prompt
+            with container_doct:
+                with st.spinner(f"{st.session_state['ui-text']['a_moment_please']}..."):
+                    try:
+                        response = get_flow2_response(user_message=pre_prompt.replace("{user_input}", prompt))
+                        response = dict(response[0].outputs[0].results["message"])["text"]
+                    except BaseException as e:
+                        response = str(e)
 
-                response = get_flow2_response(user_message=pre_prompt.replace("{user_input}", prompt))
-                response = dict(response[0].outputs[0].results["message"])["text"]
-                # try:
-                #     response = get_flow_response(user_message=prompt)
-                # except BaseException as e:
-                #     response = str(e)
+            # Display assistant response in chat message container_doct
+            with container_doct.chat_message("assistant"):
+                st.markdown(response, unsafe_allow_html=True)
+            # Add assistant response to chat history
 
-        # Display assistant response in chat message container_doct
-        with container_doct.chat_message("assistant"):
-            st.markdown(response, unsafe_allow_html=True)
-        # Add assistant response to chat history
-
-        st.session_state.doctor_messages.append({"role": "assistant", "content": response})
+            st.session_state.doctor_messages.append({"role": "assistant", "content": response})

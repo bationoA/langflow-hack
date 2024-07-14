@@ -66,16 +66,23 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# with st.sidebar:
-#     with st.form(key="credentials-form"):
-#
-#     os.environ['AIML_API_KEY'] =
-#     os.environ['MISTRAL_API_BASE'] = "https://api.aimlapi.com/"
-#     os.environ['MISTRAL_MODEL_NAME'] =
-#     os.environ['ASTRA_DB_TOKEN'] = "AstraCS:cgADHQUkEZmZGOqiHYwHNffs: bed1469e83f8767afbe29b3102ea72fef2faeb126dfa23c9bc3da3328aa8e8cc"
-#     os.environ['ASTRA_DB_ENDPOINT'] = "AstraCS:cgADHQUkEZmZGOqiHYwHNffs: bed1469e83f8767afbe29b3102ea72fef2faeb126dfa23c9bc3da3328aa8e8cc"
-#     os.environ['OPENAI_API_KEY'] = "AstraCS:cgADHQUkEZmZGOqiHYwHNffs: bed1469e83f8767afbe29b3102ea72fef2faeb126dfa23c9bc3da3328aa8e8cc"
+with st.sidebar:
+    with st.form(key="credentials-form"):
+        open_api_key = st.text_input(label="OpenAI API key", type="password")
+        # aiml_api_key = st.text_input(label="AI/ML API key", type="password")
+        # TODO: Note, for Mistral model in flow1, the aiml_api_key is provided in the file 'TrustNode Care.json'
 
+        submit_credentials = st.form_submit_button(label="Submit")
+
+    if submit_credentials:
+        invalid_values = ["", None]
+        if open_api_key in invalid_values:
+            st.error("You need to provide your OpenAI API key")
+        else:
+            os.environ['OPENAI_API_KEY'] = open_api_key
+
+            # os.environ['ASTRA_DB_TOKEN'] =
+            # os.environ['ASTRA_DB_ENDPOINT'] =
 
 
 menu_row_cols = st.columns([1, 9])
@@ -84,6 +91,10 @@ menu_row_cols = st.columns([1, 9])
 menu_row_cols[0].image(image=os.path.join("assets", "images", "logo-care-mini.png"), width=70)
 
 with menu_row_cols[1]:
+
+    if os.getenv("OPENAI_API_KEY", None) is None:
+        st.error("You need to provide your OpenAI API key in the sidebar at side of the screen.")
+
     login_or_logout = "Login" if not is_logged_in() else "Logout"
     menu_options = ["Home", "Partnership", "Pricing", login_or_logout, "Get Started", "Chat"]
 

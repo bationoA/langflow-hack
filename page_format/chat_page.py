@@ -1,3 +1,5 @@
+import os
+
 import streamlit as st
 
 from flow import get_flow1_response
@@ -116,28 +118,21 @@ def display_chat_page():
         # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": prompt})
 
-        # Collect user's query
-        # pipeline.user_query = prompt
-        with container:
-            with st.spinner(f"{st.session_state['ui-text']['a_moment_please']}..."):
-                # pipeline.run()
-                response = get_flow1_response(user_message=prompt)
-                response = dict(response[0].outputs[0].results["message"])["text"]#['outputs'][0]['results']['message']['data']['text']
-                # try:
-                #     response = get_flow_response(user_message=prompt)
-                # except BaseException as e:
-                #     response = str(e)
-
-
-        # response = f"Echo: {prompt}"
-        #     response = format_article_display(pipeline.paragraphs) if len(pipeline.paragraphs) \
-        # else f"""<p style="background-colr: white; color: red">Connection Error: Check your internet, OpenAI API key or try later.</p>"""
-
-        # response = f"""<p style="background-colr: white; color: red">Connection Error: Check your internet, OpenAI API key or try later.</p>"""
-
-        # Display assistant response in chat message container
-        with container.chat_message("assistant"):
-            st.markdown(response, unsafe_allow_html=True)
-        # Add assistant response to chat history
-        st.session_state.messages.append({"role": "assistant", "content": response})
+        if os.getenv("OPENAI_API_KEY", None) is None:
+            st.error("You need to provide your OpenAI API key in the sidebar at side of the screen.")
+        else:
+            # Collect user's query
+            # pipeline.user_query = prompt
+            with container:
+                with st.spinner(f"{st.session_state['ui-text']['a_moment_please']}..."):
+                    try:
+                        response = get_flow1_response(user_message=prompt)
+                        response = dict(response[0].outputs[0].results["message"])["text"]
+                    except BaseException as e:
+                        response = str(e)
+            # Display assistant response in chat message container
+            with container.chat_message("assistant"):
+                st.markdown(response, unsafe_allow_html=True)
+            # Add assistant response to chat history
+            st.session_state.messages.append({"role": "assistant", "content": response})
 
