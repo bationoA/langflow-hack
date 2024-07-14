@@ -23,7 +23,9 @@ def get_flow1_response(user_message: str) -> list[RunOutputs]:
         "ChatInput-UYsRC": {},
         "Prompt-pMN5s": {},
         "ChatOutput-gwqwX": {},
-        "MistralModel-WeSs4": {"mistral_api_base": "https://api.aimlapi.com/",
+        "MistralModel-WeSs4": {
+                            # "mistral_api_key": os.environ['AIML_API_KEY'], This need to be fixex. We need to be able to provide AIML_API_KEY here. For now it is in the file 'TrustNode Care.json'
+                               "mistral_api_base": "https://api.aimlapi.com/",
                                "model_name": "mistralai/Mixtral-8x7B-Instruct-v0.1"},
         "OpenAIEmbeddings-SW8Bm": {"openai_api_key": os.getenv('OPENAI_API_KEY', None)},
         "ParseData-zoXIi": {},
