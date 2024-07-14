@@ -9,7 +9,7 @@ st.set_page_config(page_title=None,
                                "Report a Bug": "mailto:amosb.dev@gmail.com | maigaabdoulaziz000@gmail.com",
                                "About": None})
 from streamlit_option_menu import option_menu
-from page_format import default_pages_config, display_login_page, display_chat_page
+from page_format import default_pages_config, display_login_page, display_chat_page, display_chat_doctor_page
 from utils import is_logged_in
 
 default_pages_config()
@@ -150,7 +150,7 @@ if selected in ["Login", "Logout"]:
     display_login_page()
 if selected == "Chat":
     info_row = st.columns([1, 1, 1])
-    if is_logged_in():
+    if is_logged_in() or 1:
         info_row[1].success("All your conversation are anonymous")
 
         chat_tab_row = st.columns([1, 5, 1])
@@ -161,8 +161,10 @@ if selected == "Chat":
             st.info(
                 "You are talking with our system, not a human. All your conversations are private and accessible by you only")
             display_chat_page()
+
         with chat_type_tabs[1]:
             st.warning("You will talk with a Doctor. A human.")
+            display_chat_doctor_page()
 
     else:
 

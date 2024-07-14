@@ -1,7 +1,13 @@
+import json
+import os.path
+
 import streamlit as st
 
 from flow import get_flow_response
 from utils import is_logged_in, redirect_to
+
+
+
 
 
 st.markdown("""
@@ -32,7 +38,7 @@ st.markdown("""
         margin-right: 190px;
     }
 
-    .container-xxl {
+    .container_doct-xxl {
         background-color: white;
         border-radius: .5rem;
     }
@@ -58,7 +64,7 @@ st.markdown("""
         width: 55%;
     }
 
-    section.main > div.block-container {
+    section.main > div.block-container_doct {
       padding: 0rem 5rem 5rem 10rem;
     }
 
@@ -86,7 +92,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-def display_chat_page():
+def display_chat_doctor_page():
+    """
+    Display chat area with a human doctor.
+
+    :return:
+    """
     if not is_logged_in():
         redirect_to("")
 
@@ -95,30 +106,35 @@ def display_chat_page():
     st.session_state['ui-text']['how_can_i_help_with_tourism_benin'] = "How can I help you?"
     st.session_state['ui-text']['a_moment_please'] = "A moment please"
 
-    container = st.container(height=450, border=True)
+    container_doct = st.container(height=450, border=True)
 
     # Initialize chat history
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+    if "doctor_messages" not in st.session_state:
+        st.session_state.doctor_messages = []
+
+    # Get sample discussion with a doctor
+    with open(os.path.join("database", "doctor_sample_chat.json"), "r") as f:
+        st.session_state.doctor_messages = json.loads(f.read())
 
     # Display chat messages from history on app rerun
-    for message in st.session_state.messages:
-        with container.chat_message(message["role"]):
+    for message in st.session_state.doctor_messages:
+        avatar = None if message["role"] != "doctor" else os.path.join("assets", "images", "doctor_jane_avatar.png")
+        with container_doct.chat_message(message["role"], avatar=avatar):
             st.markdown(message["content"], unsafe_allow_html=True)
 
     # prompt = st.session_state['prompt'] if "prompt" in st.session_state else None
 
     # React to user input
-    if prompt := st.chat_input(f"{st.session_state['ui-text']['how_can_i_help_with_tourism_benin']}?"):
-        # Display user message in chat message container
-        container.chat_message("user").markdown(prompt)
+    if prompt := st.chat_input(f"{st.session_state['ui-text']['how_can_i_help_with_tourism_benin']}?", key="chat_doctor"):
+        # Display user message in chat message container_doct
+        container_doct.chat_message("user").markdown(prompt)
 
         # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.session_state.doctor_messages.append({"role": "user", "content": prompt})
 
         # Collect user's query
         # pipeline.user_query = prompt
-        with container:
+        with container_doct:
             with st.spinner(f"{st.session_state['ui-text']['a_moment_please']}..."):
                 # pipeline.run()
                 response = get_flow_response(user_message=prompt)
@@ -135,9 +151,10 @@ def display_chat_page():
 
         # response = f"""<p style="background-colr: white; color: red">Connection Error: Check your internet, OpenAI API key or try later.</p>"""
 
-        # Display assistant response in chat message container
-        with container.chat_message("assistant"):
+        # Display assistant response in chat message container_doct
+        with container_doct.chat_message("assistant"):
             st.markdown(response, unsafe_allow_html=True)
         # Add assistant response to chat history
-        st.session_state.messages.append({"role": "assistant", "content": response})
+
+        st.session_state.doctor_messages.append({"role": "assistant", "content": response})
 

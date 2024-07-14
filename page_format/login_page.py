@@ -29,8 +29,8 @@ def display_login_page():
                     st.error("The username or password is incorrect")
                 else:
                     # redirect_to(url="")
-                    st.success("You are now authenticated!")
-                    st.page_link(label="Continue", page=os.path.join("Streamlit_app.py"))
+                    st.success("You are now logged in!")
+                    # st.page_link(label="Continue", page=os.path.join("Streamlit_app.py"))
             elif submitted:
                 st.error("username and password must be provided")
 
