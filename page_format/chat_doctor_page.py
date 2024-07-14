@@ -3,12 +3,8 @@ import os.path
 
 import streamlit as st
 
-from flow import get_flow_response
+from flow import get_flow2_response
 from utils import is_logged_in, redirect_to
-
-
-
-
 
 st.markdown("""
 <style>
@@ -101,6 +97,18 @@ def display_chat_doctor_page():
     if not is_logged_in():
         redirect_to("")
 
+    pre_prompt = """"
+    You're a useful assistant that comes at the end of a discussion between a patient and a doctor.
+    The user will ask you to perform some tasks that might include summary and more. 
+    Never take position for either the user of the doctor. 
+    Never saying or suggest something that goes against what the doctor has said during the conversation.
+    In doubt, always suggest the user book another consultation session with the doctor for more clarity or to with another doctor to have an additional point of view.
+
+    This is the pass conversation of the user with the doctor
+    context: {context}
+    User: {user_input}
+    """
+
     st.session_state['ui-text'] = {}
 
     st.session_state['ui-text']['how_can_i_help_with_tourism_benin'] = "How can I help you?"
@@ -108,13 +116,14 @@ def display_chat_doctor_page():
 
     container_doct = st.container(height=450, border=True)
 
+
     # Initialize chat history
     if "doctor_messages" not in st.session_state:
-        st.session_state.doctor_messages = []
+        # Get sample discussion with a doctor
+        with open(os.path.join("database", "doctor_sample_chat.json"), "r") as f:
+            st.session_state.doctor_conversation_only = json.loads(f.read())
 
-    # Get sample discussion with a doctor
-    with open(os.path.join("database", "doctor_sample_chat.json"), "r") as f:
-        st.session_state.doctor_messages = json.loads(f.read())
+        st.session_state.doctor_messages = st.session_state.doctor_conversation_only.copy()
 
     # Display chat messages from history on app rerun
     for message in st.session_state.doctor_messages:
@@ -122,10 +131,13 @@ def display_chat_doctor_page():
         with container_doct.chat_message(message["role"], avatar=avatar):
             st.markdown(message["content"], unsafe_allow_html=True)
 
+    pre_prompt = pre_prompt.replace("{context}", json.dumps(st.session_state.doctor_conversation_only))
+
     # prompt = st.session_state['prompt'] if "prompt" in st.session_state else None
 
     # React to user input
-    if prompt := st.chat_input(f"{st.session_state['ui-text']['how_can_i_help_with_tourism_benin']}?", key="chat_doctor"):
+    if prompt := st.chat_input(f"{st.session_state['ui-text']['how_can_i_help_with_tourism_benin']}?",
+                               key="chat_doctor"):
         # Display user message in chat message container_doct
         container_doct.chat_message("user").markdown(prompt)
 
@@ -136,20 +148,15 @@ def display_chat_doctor_page():
         # pipeline.user_query = prompt
         with container_doct:
             with st.spinner(f"{st.session_state['ui-text']['a_moment_please']}..."):
-                # pipeline.run()
-                response = get_flow_response(user_message=prompt)
-                response = dict(response[0].outputs[0].results["message"])["text"]#['outputs'][0]['results']['message']['data']['text']
+                print("user input---{}: ".format(prompt))
+                print("prompt---{}: ".format(pre_prompt.replace("{user_input}", prompt)))
+
+                response = get_flow2_response(user_message=pre_prompt.replace("{user_input}", prompt))
+                response = dict(response[0].outputs[0].results["message"])["text"]
                 # try:
                 #     response = get_flow_response(user_message=prompt)
                 # except BaseException as e:
                 #     response = str(e)
-
-
-        # response = f"Echo: {prompt}"
-        #     response = format_article_display(pipeline.paragraphs) if len(pipeline.paragraphs) \
-        # else f"""<p style="background-colr: white; color: red">Connection Error: Check your internet, OpenAI API key or try later.</p>"""
-
-        # response = f"""<p style="background-colr: white; color: red">Connection Error: Check your internet, OpenAI API key or try later.</p>"""
 
         # Display assistant response in chat message container_doct
         with container_doct.chat_message("assistant"):
@@ -157,4 +164,3 @@ def display_chat_doctor_page():
         # Add assistant response to chat history
 
         st.session_state.doctor_messages.append({"role": "assistant", "content": response})
-

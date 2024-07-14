@@ -1,6 +1,6 @@
 import streamlit as st
 
-from flow import get_flow_response
+from flow import get_flow1_response
 from utils import is_logged_in, redirect_to
 
 
@@ -121,7 +121,7 @@ def display_chat_page():
         with container:
             with st.spinner(f"{st.session_state['ui-text']['a_moment_please']}..."):
                 # pipeline.run()
-                response = get_flow_response(user_message=prompt)
+                response = get_flow1_response(user_message=prompt)
                 response = dict(response[0].outputs[0].results["message"])["text"]#['outputs'][0]['results']['message']['data']['text']
                 # try:
                 #     response = get_flow_response(user_message=prompt)
